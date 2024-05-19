@@ -39,9 +39,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.change_get_src_method()  # 更新界面显示
         self.radioButton_hex.setChecked(True)
         self.radioButton_hex.toggled.connect(self.change_number_base)
+        self.spinBox_byte_number.setValue(self.Bytes_in_data)
+        self.spinBox_byte_number.valueChanged.connect(self.change_bytes_in_data)
         self.spinBox_max_num_in_line.setValue(self.max_num_in_line)
-        self.spinBox_max_num_in_line.setMaximum(128)
-        self.spinBox_max_num_in_line.setMinimum(1)
         self.spinBox_max_num_in_line.valueChanged.connect(self.change_max_num_in_line)
         self.comboBox_comma_select.setCurrentIndex(0)
         self.comboBox_comma_select.currentIndexChanged.connect(self.change_comma_select)
@@ -134,18 +134,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         else:
             self.number_base = 16
 
-        print('number_base', self.number_base)
+    def change_bytes_in_data(self):
+        self.Bytes_in_data = self.spinBox_byte_number.value()
 
     def change_max_num_in_line(self):
         self.max_num_in_line = self.spinBox_max_num_in_line.value()
-        print('max_num_in_line', self.max_num_in_line)
 
     def change_wav_header_select(self):
         if self.comboBox_wav_header.currentIndex() == select_yes_index:
             self.add_wav_header = True
         else:
             self.add_wav_header = False
-        print('add_wav_header', self.add_wav_header)
 
     def change_c_header_select(self):
         if self.comboBox_c_name.currentIndex() == select_yes_index:
@@ -218,17 +217,33 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                         with open(wav_file_path, 'rb') as f:
                             frames = f.read()
 
-                    audio_data = np.frombuffer(frames, dtype=np.uint8)
                     try:
                         with open(out_file_name, 'w') as out_file:
+                            if sampwidth == 1 or self.Bytes_in_data == 1:
+                                audio_data = np.frombuffer(frames, dtype=np.uint8)
+                            else:
+                                if self.number_base == 16:
+                                    audio_data = np.frombuffer(frames, dtype=np.uint16)
+                                else:
+                                    audio_data = np.frombuffer(frames, dtype=np.int16)
+
                             if self.add_c_header:
-                                out_file.write("const uint8_t audio_data[] = {\n")
+                                if self.Bytes_in_data == 1:
+                                    if self.number_base == 16:
+                                        out_file.write("const uint8_t audio_data[] = {\n")
+                                    else:
+                                        out_file.write("const int8_t audio_data[] = {\n")
+                                else:
+                                    if self.number_base == 16:
+                                        out_file.write("const uint16_t audio_data[] = {\n")
+                                    else:
+                                        out_file.write("const int16_t audio_data[] = {\n")
 
                             if self.number_base == 16:
                                 # 将数据转换为16进制字符串并每16个数字后加换行符
-                                audio_str = [f"0x{value:02X}" for value in audio_data.flatten()]
+                                audio_str = [f"0x{value:02X}" if self.Bytes_in_data == 1 else f"0x{value:04X}" for value in audio_data.flatten()]
                             else:
-                                audio_str = [f"{value}" for value in audio_data.flatten()]
+                                audio_str = [f"{value:2d}" if self.Bytes_in_data == 1 else f"{value:4d}" for value in audio_data.flatten()]
 
                             for i in range(0, len(audio_str), self.max_num_in_line):
                                 if self.add_comma:
