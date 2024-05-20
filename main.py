@@ -1,26 +1,31 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow
-from PyQt5.QtCore import Qt
-
 from Ui_main import Ui_Form
+from sine_wave_generate import SineWaveGenerateWindow
 from wav_to_array import WavToArrayWindow
 
-       
 
-class MainWindow(QMainWindow):
+class MainWindow(QMainWindow, Ui_Form):
     def __init__(self):
-        super(MainWindow, self).__init__()
-        self.ui = Ui_Form()
-        self.ui.setupUi(self)
+        super().__init__()
+        self.setupUi(self)
 
-        self.ui.pushButton_wav_to_array.clicked.connect(self.wav_to_array_click)
-        self.is_window_open = False
+        self.sine_wave_generate_window = None
+        self.wav_to_array_window = None
 
-    def wav_to_array_click(self):
-        if not self.is_window_open:
-            self.wav_to_array_window = WavToArrayWindow()
+        self.pushButton_wav_to_array.clicked.connect(self.open_window)
+        self.pushButton_sine_wave_generate.clicked.connect(self.open_window)
+
+    def open_window(self):
+        sender = self.sender()
+        if sender == self.pushButton_wav_to_array:
+            if not self.wav_to_array_window:
+                self.wav_to_array_window = WavToArrayWindow()
             self.wav_to_array_window.show()
-            self.is_window_open = True
+        elif sender == self.pushButton_sine_wave_generate:
+            if not self.sine_wave_generate_window:
+                self.sine_wave_generate_window = SineWaveGenerateWindow()
+            self.sine_wave_generate_window.show()
 
 
 if __name__ == "__main__":

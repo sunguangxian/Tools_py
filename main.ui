@@ -43,9 +43,9 @@
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="pushButton_2">
+     <widget class="QPushButton" name="pushButton_sine_wave_generate">
       <property name="text">
-       <string>PushButton</string>
+       <string>DAC正弦波数据生成</string>
       </property>
      </widget>
     </item>
