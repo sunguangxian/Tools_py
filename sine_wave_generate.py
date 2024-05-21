@@ -32,7 +32,7 @@ class SineWaveGenerateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.sin_wave_int = sin_wave.astype(np.int16)
 
         # 生成 C 语言数组格式的字符串
-        sin_wave_str = 'const int16_t sin_wave[] = {\n'
+        sin_wave_str = 'const int16_t ' + 'sin_wave_' + str(sample_rate) + 'K' + '[] = {\n'
         sin_wave_str += ', '.join(map(str, self.sin_wave_int))
         sin_wave_str += '\n};'
 
