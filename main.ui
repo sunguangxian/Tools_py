@@ -50,9 +50,9 @@
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="pushButton_3">
+     <widget class="QPushButton" name="pushButton_usb_trace">
       <property name="text">
-       <string>PushButton</string>
+       <string>USB Trace Tool</string>
       </property>
      </widget>
     </item>
