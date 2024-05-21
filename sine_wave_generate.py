@@ -12,11 +12,6 @@ class SineWaveGenerateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.sin_wave_int = None
         self.setupUi(self)
 
-        int_validator_samplerate = QIntValidator(8, 128, self)
-        self.lineEdit_samplerate.setValidator(int_validator_samplerate)
-
-        int_validator_amplitude = QIntValidator(0, 32768, self)
-        self.lineEdit_amplitude.setValidator(int_validator_amplitude)
 
         self.pushButton_show.setDisabled(True)
         self.pushButton_generate.clicked.connect(self.generate_sine_wave)
@@ -25,10 +20,10 @@ class SineWaveGenerateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def generate_sine_wave(self):
         self.textBrowser.clear()
 
-        sample_rate = int(self.lineEdit_samplerate.text())
-        amplitude = int(self.lineEdit_amplitude.text())
+        sample_rate = self.spinBox_samplerate.value()
+        amplitude = self.spinBox_amplitude.value()
         # 生成0到sample_rate-1的数组
-        x = np.arange(sample_rate)
+        x = np.arange(sample_rate * self.spinBox_cycle.value())
 
         # 计算正弦波数据，并映射到DAC的范围
         sin_wave = np.sin(2 * np.pi * x / sample_rate) * amplitude
@@ -53,12 +48,11 @@ class SineWaveGenerateWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         plt.ylabel('DAC Value')
         plt.legend()
         plt.grid(True)
-        # 在每个数据点位置添加文本注释
-        for i, value in enumerate(self.sin_wave_int):
-            plt.annotate(str(value), (i, value), xytext=(i, value + 100), ha='center', fontsize=8)
+        # for i, value in enumerate(self.sin_wave_int):
+        #    plt.annotate(str(value), (i, value), xytext=(i, value + 100), 
+        #                ha='center', fontsize=8, rotation=45)  # 旋转文本
 
         plt.show()
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

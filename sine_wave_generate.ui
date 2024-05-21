@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>sine_wave_generate</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -38,12 +38,18 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="lineEdit_samplerate">
+       <widget class="QSpinBox" name="spinBox_samplerate">
         <property name="maximumSize">
          <size>
           <width>100</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="minimum">
+         <number>8</number>
+        </property>
+        <property name="maximum">
+         <number>256</number>
         </property>
        </widget>
       </item>
@@ -74,12 +80,21 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="lineEdit_amplitude">
+       <widget class="QSpinBox" name="spinBox_amplitude">
         <property name="maximumSize">
          <size>
           <width>100</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="maximum">
+         <number>32768</number>
+        </property>
+        <property name="singleStep">
+         <number>1</number>
+        </property>
+        <property name="value">
+         <number>4800</number>
         </property>
        </widget>
       </item>
@@ -87,12 +102,28 @@
        <widget class="QLabel" name="label_5">
         <property name="maximumSize">
          <size>
-          <width>50</width>
+          <width>60</width>
           <height>16777215</height>
          </size>
         </property>
         <property name="text">
-         <string/>
+         <string>循环次数：</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="spinBox_cycle">
+        <property name="maximumSize">
+         <size>
+          <width>100</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>1024</number>
         </property>
        </widget>
       </item>
