@@ -227,9 +227,13 @@ class UsbPortThread(QThread):
                 # 将 bytes 解码为字符串（假设使用 UTF-8 编码）
                 str_data = byte_data.decode('utf-8', errors='ignore')
 
-                if str_data.startswith('+LOG='):
-                    str_data = str_data.lstrip('+LOG=')
-                    # str_data = str_data.rstrip()  # 去除字符串末尾的换行符
+                # 找到第一个 +LOG= 的位置
+                log_start_index = str_data.find('+LOG=')
+                if log_start_index != -1:
+                    # 截取从第一个 +LOG= 开始的字符串
+                    str_data = str_data[log_start_index:]
+                    # 移除所有的 +LOG=
+                    str_data = str_data.replace('+LOG=', ' ')
                     # 获取当前时间，精确到毫秒
                     current_time = datetime.datetime.now()
                     # 格式化时间字符串，显示到毫秒级别
