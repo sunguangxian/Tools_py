@@ -168,6 +168,9 @@ def check_usb_vendor_info(port_identifier):
         None
     )
 
+    # 关闭设备句柄
+    kernel32.CloseHandle(device_handle)
+
     if success:
         device_descriptor = ctypes.cast(buffer, ctypes.POINTER(STORAGE_DEVICE_DESCRIPTOR)).contents
 
@@ -186,8 +189,8 @@ def check_usb_vendor_info(port_identifier):
             # 解码供应商信息为 ASCII 字符串，并去除两端空格
             vendor_info = vendor_info_ptr.value.decode('ascii').strip()
 
-            # if 'KIRISUNC' in vendor_info:
-            return True
+            if 'KIRISUNC' in vendor_info:
+                return True
 
     return False
 
@@ -213,18 +216,27 @@ class UsbPortThread(QThread):
     def receive_data(self):
         while self.port_instance is not INVALID_HANDLE_VALUE:
             try:
-                time.sleep(0.5)  # 0.5s
+                # time.sleep(0.5)  # 0.5s
 
-                receive_len = 128
+                receive_len = 256
 
                 data = self.usb_receive_message(receive_len)
 
-                # 获取当前时间，精确到毫秒
-                current_time = datetime.datetime.now()
-                # 格式化时间字符串，显示到毫秒级别
-                formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+                # 将 c_ubyte_Array_128 转换为 bytes
+                byte_data = bytes(data)
+                # 将 bytes 解码为字符串（假设使用 UTF-8 编码）
+                str_data = byte_data.decode('utf-8', errors='ignore')
 
-                self.receive_signal.emit(formatted_time, data)
+                if str_data.startswith('+LOG='):
+                    str_data = str_data.lstrip('+LOG=')
+                    # str_data = str_data.rstrip()  # 去除字符串末尾的换行符
+                    # 获取当前时间，精确到毫秒
+                    current_time = datetime.datetime.now()
+                    # 格式化时间字符串，显示到毫秒级别
+                    # formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+                    formatted_time = current_time.strftime("%H:%M:%S.%f")[:-3]
+
+                    self.receive_signal.emit(formatted_time, str_data)
 
             except Exception as e:
                 print(f"读取数据时发生异常: {e}")

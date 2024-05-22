@@ -2,6 +2,7 @@ import sys
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QTimer
 from psutil import disk_partitions
+from PyQt5.QtGui import QTextCursor
 
 try:
     from usb_trace_tool.Ui_usb_trace_tool import Ui_MainWindow
@@ -30,15 +31,25 @@ class UsbTraceWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.refresh_timer.start(1000)
 
     def clear_log_win(self):
-        self.textBrowser.clear()
+        self.plainTextEdit.clear()
 
     def update_receive_data(self, time, receive_data):
-        self.textBrowser.append(time + ' ' + receive_data)
+        cursor = self.plainTextEdit.textCursor()
+        cursor.movePosition(QTextCursor.End)  # 移动光标到文本末尾
+
+        if self.checkBox_showtime.isChecked():
+            cursor.insertText(time + ': '+ receive_data)
+        else:
+            cursor.insertText(receive_data)
+
+        # 设置滚动条位置到最底部
+        self.plainTextEdit.verticalScrollBar().setValue(
+            self.plainTextEdit.verticalScrollBar().maximum()
+        )
 
     def start_usb_trace(self):
         port_identifier = self.comboBox.currentText()
-        print(port_identifier)
-        if port_identifier in self.usb_ports:
+        if port_identifier in self.usb_ports and self.start_usb_identifier is None:
             thread = UsbPortThread(port_identifier)
             thread.receive_signal.connect(self.update_receive_data)
             thread.start()
@@ -69,7 +80,6 @@ class UsbTraceWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 current_ports.add(partition.device)
 
         existing_ports = set(port for port in self.usb_ports)
-        print(existing_ports)
 
         # 获取新添加的串口
         new_ports = set(current_ports) - existing_ports
